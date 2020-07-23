@@ -169,13 +169,17 @@ func (a *Adapter) PrepareForPush(resources []*model.Resource) error {
 		}
 	}
 	for _, project := range projects {
-		if err := a.Client.CreateProject(project.Name, project.Metadata); err != nil {
-			if httpErr, ok := err.(*common_http.Error); ok && httpErr.Code == http.StatusConflict {
-				log.Debugf("got 409 when trying to create project %s", project.Name)
-				continue
-			}
-			return err
-		}
+		// There is a known issue for replication with OIDC cli user
+		// https://github.com/goharbor/harbor/issues/11731
+		// dirty patch before the office fix
+
+		//if err := a.Client.CreateProject(project.Name, project.Metadata); err != nil {
+		//	if httpErr, ok := err.(*common_http.Error); ok && httpErr.Code == http.StatusConflict {
+		//		log.Debugf("got 409 when trying to create project %s", project.Name)
+		//		continue
+		//	}
+		//	return err
+		//}
 		log.Debugf("project %s created", project.Name)
 	}
 	return nil
